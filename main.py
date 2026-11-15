@@ -5,17 +5,26 @@ import math as m
 import os
 # pygame setup
 pygame.init()
+pygame.mixer.init()
+
+pygame.mixer.music.load("Default.mp3")
+pygame.mixer.music.set_volume(0.5)
+pygame.mixer.music.play(-1)
 screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 font = pygame.font.Font('freesansbold.ttf', 36)
 start_time = pygame.time.get_ticks()
 dt = 0
+
 score = clock.tick()/100
 vel = 550
 b_vel = 450
 angle = m.radians(90)
 radius = 25
 
+phase = 1
+image_path = os.path.join("Sans.png")
+player_image = pygame.image.load(image_path).convert_alpha()
 
 player_pos = pygame.Vector2(screen.get_width()/2, screen.get_height()/2)
 circle_pos = pygame.Vector2(screen.get_width() / 2, 40)
@@ -43,10 +52,15 @@ while running:
     elapsed_ms = pygame.time.get_ticks() - start_time
     elapsed_minutes = pygame.time.get_ticks() - start_time
     score = int(elapsed_ms / 1000)
-    while b_vel < 900:
-        b_vel += elapsed_minutes/50
-    else:
-        b_vel = 900
+    if (1300 >= b_vel >= -1300) and score <= 12:
+        if b_vel < 0:
+            b_vel -= elapsed_minutes/500
+        else:
+            b_vel += elapsed_minutes/500
+    elif 12 < score < 15:
+        b_vel = 2000
+
+
 
     circle_uno = pygame.draw.circle(screen, "white", (circle_pos.x,circle_pos.y), radius)
     border = pygame.draw.rect(screen, "white", (0,0, screen.get_width(), screen.get_height()),10)
@@ -86,6 +100,8 @@ while running:
         running = False
     score_surface = font.render(f"Score: {score}", True, (255, 255, 255))
     screen.blit(score_surface, (10, 10))
+    score_surface = font.render(f"Velocity: {b_vel}", True, (255, 255, 255))
+    screen.blit(score_surface, (10, 100))
     # flip() the display to put your work on screen
     pygame.display.flip()
 
