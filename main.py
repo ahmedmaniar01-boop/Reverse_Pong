@@ -52,18 +52,7 @@ while running:
     elapsed_ms = pygame.time.get_ticks() - start_time
     elapsed_minutes = pygame.time.get_ticks() - start_time
     score = int(elapsed_ms / 1000)
-    if (1300 >= b_vel >= -1300) and score <= 12:
-        if b_vel < 0:
-            b_vel -= elapsed_minutes/500
-        else:
-            b_vel += elapsed_minutes/500
-    elif 12 < score < 15:
-        b_vel = 2000
-
-
-
-    circle_uno = pygame.draw.circle(screen, "white", (circle_pos.x,circle_pos.y), radius)
-    border = pygame.draw.rect(screen, "white", (0,0, screen.get_width(), screen.get_height()),10)
+    border = pygame.draw.rect(screen, "white", (0, 0, screen.get_width(), screen.get_height()), 10)
     player = pygame.draw.rect(screen, "white", (player_pos.x, player_pos.y, 175, 25))
     border.clamp_ip(screen.get_rect())
     keys = pygame.key.get_pressed()
@@ -75,34 +64,49 @@ while running:
         player_pos.x -= vel * dt
     if keys[pygame.K_d]:
         player_pos.x += vel * dt
-
-    if player.x >= screen.get_width() or player.x <= 0 or player.y >= screen.get_height() or player.y <=0:
+    if player.x >= screen.get_width() or player.x <= 0 or player.y >= screen.get_height() or player.y <= 0:
         running = False
+    if phase == 1:
+        if (1300 >= b_vel >= -1300) and score <= 12:
+            if b_vel < 0:
+                b_vel -= elapsed_minutes/500
+            else:
+                b_vel += elapsed_minutes/500
+        elif 12 < score < 15:
+            b_vel = 2000
+        elif score > 15:
+            phase = 2
 
-    circle_pos.x += m.cos(angle) * b_vel * dt
-    circle_pos.y += m.sin(angle) * b_vel * dt
 
-    if circle_pos.y <= 0 or circle_pos.y >= screen.get_height() or circle_pos.x <= 0 or circle_pos.x >= screen.get_width():
-        if circle_pos.y <= 0:
-            circle_pos.y = radius+1
-        if circle_pos.x <= 0:
-            circle_pos.x = radius+1
-        if circle_pos.x >= screen.get_width():
-            circle_pos.x = screen.get_width()-(radius+1)
-        if circle_pos.y >= screen.get_height():
-            circle_pos.y = screen.get_height()-(radius+1)
-        angle = rand.randint(rand.randint(1,90), rand.randint(90,179))
-        angle *= -1
-        m.radians(angle)
-        b_vel*=-1
 
-    if check_circle_rect_collision(circle_pos.x, circle_pos.y, radius, player):
+        circle_uno = pygame.draw.circle(screen, "white", (circle_pos.x,circle_pos.y), radius)
+
+
+        circle_pos.x += m.cos(angle) * b_vel * dt
+        circle_pos.y += m.sin(angle) * b_vel * dt
+
+        if circle_pos.y <= 0 or circle_pos.y >= screen.get_height() or circle_pos.x <= 0 or circle_pos.x >= screen.get_width():
+            if circle_pos.y <= 0:
+                circle_pos.y = radius+1
+            if circle_pos.x <= 0:
+                circle_pos.x = radius+1
+            if circle_pos.x >= screen.get_width():
+                circle_pos.x = screen.get_width()-(radius+1)
+            if circle_pos.y >= screen.get_height():
+                circle_pos.y = screen.get_height()-(radius+1)
+            angle = rand.randint(rand.randint(1,90), rand.randint(90,179))
+            angle *= -1
+            m.radians(angle)
+            b_vel*=-1
+
+        if check_circle_rect_collision(circle_pos.x, circle_pos.y, radius, player):
+            running = False
+
+    if phase == 2:
         running = False
     score_surface = font.render(f"Score: {score}", True, (255, 255, 255))
     screen.blit(score_surface, (10, 10))
-    score_surface = font.render(f"Velocity: {b_vel}", True, (255, 255, 255))
-    screen.blit(score_surface, (10, 100))
-    # flip() the display to put your work on screen
+        # flip() the display to put your work on screen
     pygame.display.flip()
 
         # limits FPS to 60
